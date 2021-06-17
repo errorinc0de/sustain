@@ -10,6 +10,8 @@ import { AuthProvider } from './context/AuthProvider';
 
 // Common People or Users Components Imports
 import PeopleLogin from './routes/people/login'
+import GovtLogin from './routes/govt/GovtLogin';
+import GovtRegister from './routes/govt/GovtRegister';
 // End
 
 // Government Components Imports
@@ -30,6 +32,8 @@ function App() {
       <AuthProvider>
         <Switch>
           <Route exact path="/" component={PeopleLogin} />
+          <Route exact path="/govt-login" component={GovtLogin} />
+          <Route exact path="/govt-registration" component={GovtRegister} />
           <Route exact path="/peopleLogin" component={PeopleLogin} />
         </Switch>
       </AuthProvider>

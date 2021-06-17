@@ -101,6 +101,34 @@ export function AuthProvider({ children }) {
       function updatePassword(password) {
         return currentUser.updatePassword(password)
       }
+
+
+
+
+      // Register goverment employees
+      function GovSignup(email, password, name , state) {
+        return new Promise((resolve, reject) => {
+            auth.createUserWithEmailAndPassword(email, password).then(function(result) {
+            const user = auth.currentUser;
+            user.updateProfile({
+                displayName: name
+            }).then((result)=> {
+                db.collection("users").doc(user.uid).set({
+                    displayName: name,
+                    uid: user.uid,
+                    email: email,
+                    state:state,
+                    isGovt : true
+                }).then(()=>{
+                    resolve()
+                })
+                .catch(error => reject("error creating profile"));
+            })
+            .catch(error => reject(error));
+            })
+            .catch(error => reject(error));
+        })
+    }
     
       useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
@@ -131,7 +159,8 @@ export function AuthProvider({ children }) {
         resetPassword,
         updateEmail,
         updatePassword,
-        createUser
+        createUser,
+        GovSignup
     }
 
     return (
