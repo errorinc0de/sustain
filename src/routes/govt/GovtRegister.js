@@ -59,7 +59,7 @@ function GovtRegister() {
         if(currentUser && currentUser.uid)
         {
             if(currentUser.isGovt)
-                history.push("/govt")
+                history.push("/govt-dashboard")
         }
     },[currentUser])
     return (

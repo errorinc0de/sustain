@@ -22,4 +22,6 @@ export const storageRef = firebase.storage().ref();
 export const timestamp = firebase.firestore.FieldValue.serverTimestamp()
 export const GeoFirestore = geofirestore.initializeApp(db);
 export const geoRef = firebase.firestore
+export const captchaRef = firebase.auth;
+
 export default app

@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react"
-import { auth, db } from "../firebase"
+import { auth, db, verifyOTP } from "../firebase"
 
 const AuthContext = React.createContext()
 
@@ -129,6 +129,104 @@ export function AuthProvider({ children }) {
             .catch(error => reject(error));
         })
     }
+
+
+      // Login goverment employees
+      function GovLogin(email, password) {
+        return new Promise((resolve, reject) => {
+          db.collection("users").where("email","==",email).onSnapshot((docs)=>{
+            if(!docs.empty)
+            {
+              docs.forEach(doc=>{
+                if(doc.exists)
+                {
+                    if(doc.data().isUser === undefined && doc.data().isShop === undefined && doc.data().isCompany === undefined) 
+                    {
+                      auth.signInWithEmailAndPassword(email, password).then(() => {
+                        resolve()
+                      })
+                      .catch(error => reject(error));
+                    }
+                    else
+                    {
+                      reject({message:"Not registered as an user"})
+                    }
+                }
+                else
+                {
+                  reject({message:"no such account exists"})
+                }
+              })
+            }
+            else
+            {
+              reject({message:"no such account exists"})
+            }
+          })
+        })
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// register
+
+  function peopleRegister(phoneNumber,captcha) {
+    return new Promise((resolve, reject) => {
+      console.log("yo")
+        auth.signInWithPhoneNumber("+91"+phoneNumber, captcha).then((confirmationResult) => {
+          resolve()
+        })
+        .catch(error => reject(error))
+    })
+  }
+
+function registerConfirmation(phoneNumber,name,cardNumber,address,cardType,rationDealer,state,stateName,district,otp) {
+  return new Promise((resolve, reject) => {
+
+
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
       useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
@@ -160,7 +258,10 @@ export function AuthProvider({ children }) {
         updateEmail,
         updatePassword,
         createUser,
-        GovSignup
+        GovSignup,
+        GovLogin,
+        peopleRegister,
+        registerConfirmation
     }
 
     return (

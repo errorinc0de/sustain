@@ -5,3 +5,22 @@ input[type=number]::-webkit-outer-spin-button {
     appearance: none;
     margin: 0; 
 }
+.theme-btn-r
+{
+    background-color: black !important;
+    padding: 10px 20px !important;
+}
+
+.legend{
+    margin: 10px;
+    width: fit-content;
+    opacity: 0.5;
+    font-size: 16px;
+    padding: 0px 10px;
+  }
+  
+.fieldset{
+    border: 3px solid #1819284f;
+    padding: 0px 30px;
+    margin:10px 0px;
+  }
