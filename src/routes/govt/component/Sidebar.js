@@ -24,7 +24,7 @@ function Sidebar() {
                 <NavLink to="/govt-dashboard" activeClassName="active"><li><FontAwesomeIcon icon={faHome} /><span>Home</span></li></NavLink>
                 <NavLink to="/schemes" activeClassName="active"><li><FontAwesomeIcon icon={faFileContract} /><span>Schemes</span></li></NavLink>
                 <NavLink to="/quota" activeClassName="active" ><li><FontAwesomeIcon icon={faCashRegister} /><span>Quota</span></li></NavLink>
-                <NavLink to="/mystories" activeClassName="active"><li><FontAwesomeIcon icon={faUserCheck} /><span>Verification</span></li></NavLink>
+                <NavLink to="/verification" activeClassName="active"><li><FontAwesomeIcon icon={faUserCheck} /><span>Verification</span></li></NavLink>
                 <NavLink to="/shops" activeClassName="active"><li><FontAwesomeIcon icon={faStore} /><span>Ration Shops</span></li></NavLink>
                 <NavLink to="/mystories" activeClassName="active"><li><FontAwesomeIcon icon={faBullhorn} /><span>People's Voice</span></li></NavLink>
                 <li><button variant="light" onClick={handleLogout}><FontAwesomeIcon icon={faSignOutAlt}/><span>Sign out</span></button></li>

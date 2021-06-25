@@ -17,6 +17,8 @@ import GovtDashboard from './routes/govt/GovtDashboard';
 import Shops from './routes/govt/Shops';
 import Schemes from './routes/govt/Schemes';
 import Quota from './routes/govt/Quota';
+import Verification from './routes/govt/Verification';
+import VerifyProfile from './routes/people/VerifyProfile';
 // End
 
 // Government Components Imports
@@ -45,6 +47,8 @@ function App() {
           <Route exact path="/shops" component={Shops} />
           <Route exact path="/schemes" component={Schemes} />
           <Route exact path="/quota" component={Quota} />
+          <Route exact path="/verification" component={Verification} />
+          <Route exact path="/verify-profile" component={VerifyProfile} />
         </Switch>
       </AuthProvider>
     </Router>

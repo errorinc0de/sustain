@@ -33,21 +33,48 @@ export function AuthProvider({ children }) {
         })
     }
   
-    function createUser(payload)
+    function createUser(name,phoneNumber,address,cardType,cardNumber,state,district,rationDealer,user_id)
     {
-        db.collection("users").doc(payload.user_id).onSnapshot((doc)=>{
-    
+      return new Promise((resolve, reject) => {
+        db.collection("users").doc(user_id).get().then((doc)=>{
             if(!doc.exists)
             {
-                db.collection("users").doc(payload.user_id).set({
-                    displayName:"",
-                    uid:payload.user_id,
-                    phoneNumber:payload.identifier
+                db.collection("users").doc(user_id).set({
+                    displayName:name,
+                    uid:user_id,
+                    phoneNumber:phoneNumber,
+                    address,
+                    cardType,
+                    cardNumber,
+                    state,
+                    district,
+                    rationDealer,
+                    isPeople:true,
+                    isVerified:false
+                }).then(()=>{
+                  setCurrentUser({
+                    displayName:name,
+                    uid:user_id,
+                    phoneNumber:phoneNumber,
+                    address,
+                    cardType,
+                    cardNumber,
+                    state,
+                    district,
+                    rationDealer,
+                    isPeople:true,
+                    isVerified:false
                 })
-            } else {
+
+                resolve()
+                })
+            } else 
+            {
+                resolve()
                 setCurrentUser(doc.data())
             }
         })
+      })
     }
 
     function login(email, password) {
@@ -169,64 +196,6 @@ export function AuthProvider({ children }) {
 
 
 
-
-
-
-
-
-
-
-
-
-// register
-
-  function peopleRegister(phoneNumber,captcha) {
-    return new Promise((resolve, reject) => {
-      console.log("yo")
-        auth.signInWithPhoneNumber("+91"+phoneNumber, captcha).then((confirmationResult) => {
-          resolve()
-        })
-        .catch(error => reject(error))
-    })
-  }
-
-function registerConfirmation(phoneNumber,name,cardNumber,address,cardType,rationDealer,state,stateName,district,otp) {
-  return new Promise((resolve, reject) => {
-
-
-  })
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
       useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
@@ -260,8 +229,6 @@ function registerConfirmation(phoneNumber,name,cardNumber,address,cardType,ratio
         createUser,
         GovSignup,
         GovLogin,
-        peopleRegister,
-        registerConfirmation
     }
 
     return (

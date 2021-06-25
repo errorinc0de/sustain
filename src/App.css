@@ -24,3 +24,24 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 0px 30px;
     margin:10px 0px;
   }
+.big-header
+{
+  font-size: 35px;
+  opacity: 0.1;
+  font-weight: bold;
+}
+.header-desc
+{
+  margin-top: -10px;
+  margin-left: 20px;
+}
+.hidden
+{
+  opacity:0;
+}
+
+.img-holder
+{
+  width:200px;
+  height:250px;
+}

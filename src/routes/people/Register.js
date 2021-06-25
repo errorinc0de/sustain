@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Form , Button, Spinner } from 'react-bootstrap'
+import { Form , Button, Spinner, Container, Row, Col } from 'react-bootstrap'
 import {Link, useHistory} from 'react-router-dom'
 import { useAuth } from '../../context/AuthProvider'
 import { captchaRef, db } from '../../firebase'
 import '../styles/login.css'
-
+import Sawo from "sawo"
 function Register() {
-    const {currentUser,peopleRegister,registerConfirmation} = useAuth()
+    const {currentUser,createUser} = useAuth()
 
     const [error,setError] = useState()
     const [loading, setLoading] = useState(false)
@@ -18,22 +18,22 @@ function Register() {
     const [selectedStateName, setselectedStateName] = useState(null)
     const [cardType, setCardType] = useState(null)
     const [shopList, setShopList] = useState([])
-    const [showOTP,setShowOTP] =useState(false)
 
+    const [showForm,setShowForm] = useState(false)
+    const [payload,setPayload] = useState(null)
     const history = useHistory()
 
     const nameRef = useRef()
     const cardNumberRef = useRef()
     const addressRef = useRef()
     const phoneNumbeRef = useRef()
-    const otpRef = useRef()
 
 
     useEffect(()=>{
         if(currentUser && currentUser.uid)
         {
             if(currentUser.isGovt)
-                history.push("/govt-dashboard")
+                history.push("/verify-profile")
         }
     },[currentUser])
 
@@ -95,6 +95,7 @@ function Register() {
                 docs.forEach((doc)=>{
                     shoplist.push({uid:doc.id,...doc.data()})
                 })
+                console.log(shoplist    )
                 setShopList(shoplist)
             }else
             {
@@ -102,40 +103,28 @@ function Register() {
             }
         }) 
       }
-      
-    function handleRegister(e)
-    {
-        e.preventDefault()
 
-        window.recaptchaVerifier = new captchaRef.RecaptchaVerifier('recaptcha-container', {
-            'size': 'normal',
-            'callback': (response) => {
-                handleRegistration();
+      function handleRegister(e)
+      {
+          e.preventDefault()
+          createUser(nameRef.current.value,phoneNumbeRef.current.value,addressRef.current.value,cardType,cardNumberRef.current.value,selectedState,selectedDistrict,rationDealer,payload.user_id).then(()=>{
+              history.push("/verify-profile")
+          })
+      }
+
+      useEffect(() => {
+        var config = {
+            containerID: "sawo-container",
+            identifierType: "phone_number_sms",
+            apiKey: "fcda7114-a385-439f-aef0-6eef92844230",
+            onSuccess: (payload) => {
+                setShowForm(true)
+                setPayload(payload)
             },
-          });
-
-          window.recaptchaVerifier.render()
-
-
-    }
-    function handleOTP(e)
-    {
-        e.preventDefault()
-
-        registerConfirmation(phoneNumbeRef.current.value,nameRef.current.value,cardNumberRef.current.value,addressRef.current.value,cardType,rationDealer,selectedState,selectedStateName,selectedDistrict , otpRef.current.value).then(()=>{
-            setShowOTP(true)
-        }).catch((error)=>console.log(error))
-
-    }
-
-    function handleRegistration()
-    {
-        console.log("huiiiiiiiiii")
-
-        peopleRegister(phoneNumbeRef.current.value, window.recaptchaVerifier).then(()=>{
-            setShowOTP(true)
-        }).catch((error)=>console.log(error))
-    }
+          };
+          let sawo = new Sawo(config);
+          sawo.showForm();
+       }, []);
 
     return (
         <div className="login-page">
@@ -147,92 +136,99 @@ function Register() {
                     <div className="show-error">
                         {error}
                     </div>)}
-                        <Form className="my-2" onSubmit={handleRegister}>
-                        <Form.Group controlId="name">
-                            <Form.Label>Name</Form.Label>
-                            <Form.Control type="text" ref={nameRef} placeholder="Enter your name" />
-                        </Form.Group>
-                        <Form.Group controlId="name">
-                            <Form.Label>Phone Number</Form.Label>
-                            <Form.Control type="text" ref={phoneNumbeRef} placeholder="Enter your phone Number" />
-                        </Form.Group>
-                        <Form.Group controlId="cardNumber">
-                            <Form.Label>Ration Card Number</Form.Label>
-                            <Form.Control type="text" ref={cardNumberRef} placeholder="Enter your card Number" />
-                        </Form.Group>
-                        <Form.Group controlId="address">
-                            <Form.Label>Address</Form.Label>
-                            <Form.Control type="text" ref={addressRef} placeholder="Enter your address" />
-                        </Form.Group>
-                        <Form.Group controlId="cardType">
-                            <Form.Label>Card Type</Form.Label>
-                            <div className="ml-1">
-                                <Form.Check inline label="BPL/LPG" name="group1" type="radio" id={`inline-BPL`} onClick={()=>setCardType("BPL/LPG")} />
-                                <Form.Check inline label="BPL/Non-LPG" name="group1" type="radio" id={`inline-BPL`} onClick={()=>setCardType("BPL/Non-LPG")} />
-                                <Form.Check inline label="APL" name="group1" type="radio" id={`inline-APL`} onClick={()=>setCardType("APL")} />
-                                <Form.Check inline label="AY" name="group1" type="radio" id={`inline-AY`} onClick={()=>setCardType("AY")} />
-                            </div>
-                        </Form.Group>
-                        <Form.Group controlId="shopName">
-                        <Form.Label>State</Form.Label>
-                        <Form.Control as="select"  onChange={(e)=>getDistrictList(e.target.value)} >
-                            {stateList && stateList.length > 0 && stateList.map((state,key)=>{
-                                return(<option value={state.value} key={key}>{state.name}</option>)
-                            })}
-                        </Form.Control>
-                    </Form.Group>
-                    <Form.Group controlId="shopName">
-                        <Form.Label>District</Form.Label>
-                        <Form.Control as="select"  onChange={(e)=>getRationShop(e.target.value)} disabled={districtList.length <= 0 && ("disabled")}>
-                            {districtList && districtList.length > 0 && districtList.map((district,key)=>{
-                                return(<option key={key}>{district.name}</option>)
-                            })}
-                        </Form.Control>
-                    </Form.Group>
 
-                    <Form.Group controlId="shopName">
-                        <Form.Label>Ration Dealer</Form.Label>
-                        <Form.Control as="select"  onChange={(e)=>setRationDealer(e.target.value)} disabled={shopList.length <= 0 && ("disabled")}>
-                            {shopList && shopList.length > 0 && shopList.map((shop,key)=>{
-                                return(<option value={shop.uid} key={key}>{shop.displayName}</option>)
-                            })}
-                        </Form.Control>
-                    </Form.Group>
-
-                        <div id="recaptcha-container"></div>
+                    {!showForm && ( <div
+                        id="sawo-container"
+                        style={{ height: "300px", width: "300px",marginTop:"300px" }}
                         
-                       
-                        {!showOTP ? (
-                        <Button variant="light" className="theme-btn w-100" type="submit">{loading ?(
-                            <Spinner animation="border" role="status">
-                                <span className="sr-only">Loading...</span>
-                            </Spinner>
-                        ):("Register")}
-                        </Button>
-                        ):false}
-                        
-                         
+                        ></div>)}
 
-                        
-                    </Form>
+                        {showForm && (
 
-                    {showOTP && (
-                        <Form className="my-2" onSubmit={handleOTP}>
-                            <Form.Group controlId="name">
-                                <Form.Label>OTP</Form.Label>
-                                <Form.Control type="number" ref={otpRef} placeholder="Enter your OTP" />
-                            </Form.Group>
-                        <Button variant="light" className="theme-btn" type="submit">{loading ?(
-                            <Spinner animation="border" role="status">
-                                <span className="sr-only">Loading...</span>
-                            </Spinner>
-                        ):("Register")}
-                        
-                        </Button> 
+                            <Form className="my-2" onSubmit={handleRegister}>
 
+                                <Container fluid>
+                                    <Row>
+                                        <Col lg={4}>
+                                            <Form.Group controlId="name">
+                                                <Form.Label>Name</Form.Label>
+                                                <Form.Control type="text" ref={nameRef} placeholder="Enter your name" />
+                                            </Form.Group>
+                                            <Form.Group controlId="name">
+                                                <Form.Label>Phone Number</Form.Label>
+                                                <Form.Control type="text" defaultValue={payload && payload.identifier} ref={phoneNumbeRef} placeholder="Enter your phone Number" disabled/>
+                                            </Form.Group>
+                                            <Form.Group controlId="address">
+                                                <Form.Label>Address</Form.Label>
+                                                <Form.Control type="text" ref={addressRef} placeholder="Enter your address" />
+                                            </Form.Group>
 
-                        </Form>
-                    )}
+                                        </Col>
+                                        <Col lg={4}>
+                                            
+                                            
+                                            <Form.Group controlId="cardType">
+                                                <Form.Label>Card Type</Form.Label>
+                                                <div className="ml-1">
+                                                    <Form.Check inline label="BPL/LPG" name="group1" type="radio" id={`inline-BPL`} onClick={()=>setCardType("BPL/LPG")} />
+                                                    <br></br>
+                                                    <Form.Check inline label="BPL/Non-LPG" name="group1" type="radio" id={`inline-BPL`} onClick={()=>setCardType("BPL/Non-LPG")} />
+                                                    <br></br>
+                                                    <Form.Check inline label="APL" name="group1" type="radio" id={`inline-APL`} onClick={()=>setCardType("APL")} />
+                                                    <br></br>
+                                                    <Form.Check inline label="AY" name="group1" type="radio" id={`inline-AY`} onClick={()=>setCardType("AY")} />
+                                                </div>
+                                            </Form.Group>
+                                            <Form.Group controlId="cardNumber">
+                                                <Form.Label>Ration Card Number</Form.Label>
+                                                <Form.Control type="text" ref={cardNumberRef} placeholder="Enter your card Number" />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col lg={4}>
+                                            <Form.Group controlId="shopName">
+                                                <Form.Label>State</Form.Label>
+                                                <Form.Control as="select"  onChange={(e)=>getDistrictList(e.target.value)} >
+                                                    {stateList && stateList.length > 0 && stateList.map((state,key)=>{
+                                                        return(<option value={state.value} key={key}>{state.name}</option>)
+                                                    })}
+                                                </Form.Control>
+                                                </Form.Group>
+                                                <Form.Group controlId="shopName">
+                                                <Form.Label>District</Form.Label>
+                                                <Form.Control as="select"  onChange={(e)=>getRationShop(e.target.value)} disabled={districtList.length <= 0 && ("disabled")}>
+                                                    {districtList && districtList.length > 0 && districtList.map((district,key)=>{
+                                                        return(<option key={key}>{district.name}</option>)
+                                                    })}
+                                                </Form.Control>
+                                                </Form.Group>
+
+                                                <Form.Group controlId="shopName">
+                                                <Form.Label>Ration Dealer</Form.Label>
+                                                <Form.Control as="select"  onChange={(e)=>setRationDealer(e.target.value)} disabled={shopList.length <= 0 && ("disabled")}>
+                                                
+                                                    <option value="" hidden>Select Ration Shop</option>
+                                                    {shopList && shopList.length > 0 && shopList.map((shop,key)=>{
+                                                        return(<option value={shop.uid} key={key}>{shop.displayName}</option>)
+                                                    })}
+                                                </Form.Control>
+                                                </Form.Group>
+                                        </Col>
+                                    </Row>
+
+                                </Container>
+                               
+                                
+                               
+
+                                <Button variant="light" className="theme-btn w-100" type="submit">{loading ?(
+                                    <Spinner animation="border" role="status">
+                                        <span className="sr-only">Loading...</span>
+                                    </Spinner>
+                                ):("Register")}
+                                </Button>
+                            </Form>
+                            
+                        )}
                     
                 </div>
         </div>
