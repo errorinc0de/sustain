@@ -194,7 +194,15 @@ export function AuthProvider({ children }) {
     }
 
 
-
+    function peopleLogin(payload)
+    {
+      db.collection("users").doc(payload.user_id).get().then((doc)=>{
+        if(doc.exists)
+        {
+          setCurrentUser(doc.data())
+        }
+      })
+    }
 
     
       useEffect(() => {
@@ -229,6 +237,7 @@ export function AuthProvider({ children }) {
         createUser,
         GovSignup,
         GovLogin,
+        peopleLogin
     }
 
     return (

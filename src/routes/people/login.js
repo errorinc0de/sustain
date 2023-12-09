@@ -3,10 +3,11 @@ import { Form , Button, Spinner } from 'react-bootstrap'
 import {Link, useHistory} from 'react-router-dom'
 import { useAuth } from '../../context/AuthProvider'
 import '../styles/login.css'
+import Sawo from "sawo"
 
 function Login() {
 
-    const {currentUser,GovLogin} = useAuth()
+    const {currentUser,logout,peopleLogin} = useAuth()
 
     const [error,setError] = useState()
     const [loading, setLoading] = useState(false)
@@ -16,31 +17,36 @@ function Login() {
     const passwordRef = useRef()
     const emailRef = useRef()
 
-    function handleLogin(e)
-    {
-        e.preventDefault()
-        setLoading(true)
-
-        if(passwordRef.current.value.length < 6)
-        {
-            setLoading(false)
-            setError("Password must be of 6 character")
-            return
+    async function handleLogout() {    
+        try {
+          await logout()
+          history.push("/hr-login")
+        } catch {
+          console.log("Failed to log out")
         }
-        GovLogin(emailRef.current.value,passwordRef.current.value).then(()=>{
-            history.push("/govt-dashboard")
-            setLoading(false)
-        }).catch((err)=>{
-            setError(err.meesage)
-            setLoading(false)
-        })
-    }
+      }
 
+
+    useEffect(() => {
+        var config = {
+            containerID: "sawo-container",
+            identifierType: "phone_number_sms",
+            apiKey: "fcda7114-a385-439f-aef0-6eef92844230",
+            onSuccess: (payload) => {
+                peopleLogin(payload)
+            },
+          };
+          let sawo = new Sawo(config);
+          sawo.showForm();
+       }, []);
+    
     useEffect(()=>{
         if(currentUser && currentUser.uid)
         {
-            if(currentUser.isGovt)
-                history.push("/govt-dashboard")
+            if(currentUser.isPeople)
+                history.push("/dashboard")
+            else
+                handleLogout()
         }
     },[currentUser])
 
@@ -54,24 +60,11 @@ function Login() {
                     <div className="show-error">
                         {error}
                     </div>)}
-                    <Form className="my-2" onSubmit={handleLogin}>
-                        <Form.Group controlId="email">
-                            <Form.Label>Email Id</Form.Label>
-                            <Form.Control type="email" ref={emailRef} placeholder="Enter your email" />
-                        </Form.Group>
-                        <Form.Group controlId="password">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" ref={passwordRef} placeholder="Enter your password" />
-                        </Form.Group>
-                       
-                        <Button variant="light" className="theme-btn" type="submit">{loading ?(
-                            <Spinner animation="border" role="status">
-                                <span className="sr-only">Loading...</span>
-                            </Spinner>
-                        ):("Login")}
+                    <div
+                        id="sawo-container"
+                        style={{ height: "300px", width: "300px",marginTop:"300px" }}
                         
-                        </Button> 
-                    </Form>
+                        ></div>
                     
                 </div>
         </div>
